@@ -4,3 +4,6 @@ def index(request):
     return render(request, 'main/maintemp.html')
 
 
+
+
+
