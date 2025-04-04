@@ -1,14 +1,14 @@
+from django.urls import path, include
+from main import views
 
-from django.urls import path
-from  . import views
 
 urlpatterns = [
-    path('', views.index, name = 'index')
-
-from django.shortcuts import path, include
-
-# Create your views here.
-urlpatterns = [
-    path('', include('main.urls'))
+    path('', views.index, name = 'index'),
+    path('students/', views.student_list, name='student_list')
 
 ]
+
+
+
+
+

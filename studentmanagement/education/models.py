@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib.auth.models import AbstractUser
 
 class Student(models.Model):
     first_name = models.CharField(max_length=50)
@@ -25,5 +26,12 @@ class Grade(models.Model):
 
     def __str__(self):
         return f"{self.student} - {self.course}: {self.grade}"
+
+class CustomUser(AbstractUser):
+    birth_date = models.DateField(null=True, blank=True)
+    profile_image = models.ImageField(upload_to='profiles/', null=True, blank=True)
+
+    def __str__(self):
+        return self.username
 
 
