@@ -2,14 +2,58 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Список студентов</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+        form {
+            margin-bottom: 20px;
+        }
+        input[type="text"] {
+            padding: 10px;
+            font-size: 16px;
+            width: 250px;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        h1 {
+            color: #333;
+        }
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        li {
+            padding: 8px 0;
+        }
+    </style>
 </head>
 <body>
     <h1>Список студентов</h1>
-    <ul>
-        {% for student in students %}
-            <li>{{ student.first_name }} {{ student.last_name }}</li>
-        {% endfor %}
-    </ul>
+
+    <!-- Форма поиска -->
+    <form method="get">
+        <input type="text" name="q" placeholder="Поиск по имени, фамилии или email" value="{{ request.GET.q }}">
+        <button type="submit">Поиск</button>
+    </form>
+
+    {% if request.GET.q %}
+        <h2>Результаты поиска:</h2>
+        <ul>
+            {% for student in students %}
+                <li>{{ student.first_name }} {{ student.last_name }} - {{ student.email }}</li>
+            {% empty %}
+                <li>Студенты не найдены.</li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>Введите имя, фамилию или email для поиска студентов.</p>
+    {% endif %}
 </body>
 </html>
