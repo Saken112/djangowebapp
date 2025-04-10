@@ -1,8 +1,17 @@
 {% extends 'base_generic.html' %}
 
 {% block content %}
-  <h2>Профиль пользователя</h2>
-  <p>Добро пожаловать, {{ user.username }}!</p>
-  <p>Ваш email: {{ user.email }}</p>
+  <h2>Ваш профиль</h2>
+  <p><strong>Имя:</strong> {{ user.first_name }} {{ user.last_name }}</p>
+  <p><strong>Роль:</strong> {{ user.role }}</p>
+  <p><strong>Email:</strong> {{ user.email }}</p>
+  <p><strong>Дата рождения:</strong> {{ user.birth_date }}</p>
+
+  {% if user.profile_image %}
+    <img src="{{ user.profile_image.url }}" alt="Фото профиля" />
+  {% else %}
+    <p>Фото профиля не установлено.</p>
+  {% endif %}
+
   <a href="{% url 'logout' %}">Выйти</a>
 {% endblock %}

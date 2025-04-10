@@ -1,0 +1,15 @@
+{% extends 'base_generic.html' %}
+
+{% block content %}
+  <h2>Личный кабинет преподавателя</h2>
+  <p>Добро пожаловать, {{ teacher.user.first_name }} {{ teacher.user.last_name }}!</p>
+
+  <h3>Ваши курсы:</h3>
+  <ul>
+    {% for course in courses %}
+      <li>{{ course.name }} ({{ course.code }})</li>
+    {% empty %}
+      <li>Вы не преподаете ни одного курса.</li>
+    {% endfor %}
+  </ul>
+{% endblock %}

@@ -1,0 +1,24 @@
+{% extends 'base_generic.html' %}
+
+{% block content %}
+  <h2>Личный кабинет студента</h2>
+  <p>Добро пожаловать, {{ student.first_name }} {{ student.last_name }}!</p>
+
+  <h3>Ваши курсы:</h3>
+  <ul>
+    {% for course in courses %}
+      <li>{{ course.name }} ({{ course.code }})</li>
+    {% empty %}
+      <li>Вы не записаны на курсы.</li>
+    {% endfor %}
+  </ul>
+
+  <h3>Ваши оценки:</h3>
+  <ul>
+    {% for grade in grades %}
+      <li>{{ grade.course.name }}: {{ grade.grade }}</li>
+    {% empty %}
+      <li>У вас нет оценок.</li>
+    {% endfor %}
+  </ul>
+{% endblock %}
