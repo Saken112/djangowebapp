@@ -1,0 +1,25 @@
+h1 {
+    text-align: center;
+    margin-top: 25px;
+    font-size: 50px;
+}
+
+a:hover {
+    background-color: #3498db;
+    color: white;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.auth-links a {
+    font-size: 16px;
+    text-decoration: none;
+}
+
+.auth-links a:hover {
+    opacity: 0.8;
+}
