@@ -1,0 +1,11 @@
+<h2>Личный кабинет студента</h2>
+<p>Имя: {{ student.user.get_full_name }}</p>
+
+<h3>Оценки:</h3>
+<ul>
+    {% for grade in grades %}
+        <li>{{ grade.course.name }} — {{ grade.value }}</li>
+    {% empty %}
+        <li>Оценок пока нет</li>
+    {% endfor %}
+</ul>

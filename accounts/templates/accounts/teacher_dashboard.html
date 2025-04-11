@@ -1,0 +1,10 @@
+<h2>Личный кабинет преподавателя</h2>
+
+<h3>Курсы:</h3>
+<ul>
+    {% for course in courses %}
+        <li>{{ course.name }}</li>
+    {% empty %}
+        <li>Пока нет курсов</li>
+    {% endfor %}
+</ul>

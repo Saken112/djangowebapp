@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Dashboard</title>
+</head>
+<body>
+    <h1>Добро пожаловать, {{ user.username }}!</h1>
+    <p>Дата рождения: {{ user.birth_date }}</p>
+    {% if user.profile_image %}
+        <img src="{{ user.profile_image.url }}" alt="Профиль" height="100">
+    {% else %}
+        <p>Нет фото профиля</p>
+    {% endif %}
+</body>
+</html>

@@ -30,8 +30,9 @@ class Grade(models.Model):
 class CustomUser(AbstractUser):
     birth_date = models.DateField(null=True, blank=True)
     profile_image = models.ImageField(upload_to='profiles/', null=True, blank=True)
+    is_student = models.BooleanField(default=False)
+    is_teacher = models.BooleanField(default=False)
 
     def __str__(self):
         return self.username
-
 
