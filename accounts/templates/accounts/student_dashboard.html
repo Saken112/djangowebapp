@@ -1,11 +1,42 @@
-<h2>Личный кабинет студента</h2>
-<p>Имя: {{ student.user.get_full_name }}</p>
+{% extends 'base_generic.html' %}
 
-<h3>Оценки:</h3>
-<ul>
-    {% for grade in grades %}
-        <li>{{ grade.course.name }} — {{ grade.value }}</li>
-    {% empty %}
-        <li>Оценок пока нет</li>
-    {% endfor %}
-</ul>
+{% block content %}
+<div class="container mt-4">
+    <h2 class="mb-4">👨‍🎓 Личный кабинет студента</h2>
+
+    <div class="card mb-4" style="max-width: 600px;">
+        <div class="row g-0">
+            {% if student.user.profile_image %}
+            <div class="col-md-4">
+                <img src="{{ student.user.profile_image.url }}" class="img-fluid rounded-start" alt="Фото профиля">
+            </div>
+            {% endif %}
+            <div class="col-md-8">
+                <div class="card-body">
+                    <h5 class="card-title">{{ student.user.get_full_name }}</h5>
+                    <p class="card-text"><strong>Логин:</strong> {{ student.user.username }}</p>
+                    <p class="card-text"><strong>Email:</strong> {{ student.user.email }}</p>
+                    <p class="card-text"><strong>Дата рождения:</strong> {{ student.user.birth_date|date:"d.m.Y" }}</p>
+                    <p class="card-text"><strong>Дата поступления:</strong> {{ student.enrollment_date|date:"d.m.Y" }}</p>
+                    {# Добавим группу, если она есть в модели Student #}
+                    {% if student.group %}
+                        <p class="card-text"><strong>Группа:</strong> {{ student.group }}</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <h4 class="mb-3">📊 Мои оценки:</h4>
+    <ul class="list-group mb-4">
+        {% for grade in grades %}
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+                {{ grade.course.name }}
+                <span class="badge bg-primary rounded-pill">{{ grade.grade }}</span>
+            </li>
+        {% empty %}
+            <li class="list-group-item text-muted">Оценок пока нет</li>
+        {% endfor %}
+    </ul>
+</div>
+{% endblock %}
