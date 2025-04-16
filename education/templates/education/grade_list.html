@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block content %}
+  <h2>Список оценок</h2>
+  <ul>
+    {% for grade in grades %}
+      <li>{{ grade.student }} — {{ grade.course }}: <strong>{{ grade.grade }}</strong></li>
+    {% empty %}
+      <li>Оценок пока нет.</li>
+    {% endfor %}
+  </ul>
+
+  {% if user.is_teacher %}
+    <a href="{% url 'add_grade' %}">Добавить новую оценку</a>
+  {% endif %}
+{% endblock %}

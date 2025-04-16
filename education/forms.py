@@ -2,6 +2,8 @@ from .models import Student
 from django.contrib.auth.forms import UserCreationForm
 from django import forms
 from .models import CustomUser
+from .models import Grade, Course
+
 
 class CustomUserCreationForm(UserCreationForm):
     ROLE_CHOICES = (
@@ -30,3 +32,14 @@ class CustomUserCreationForm(UserCreationForm):
                     email=user.email
                 )
         return user
+
+class GradeForm(forms.ModelForm):
+    class Meta:
+        model = Grade
+        fields = ['student', 'course', 'grade']
+
+    def __init__(self, *args, **kwargs):
+        user = kwargs.pop('user', None)
+        super().__init__(*args, **kwargs)
+        if user and user.is_teacher:
+            self.fields['course'].queryset = Course.objects.filter(teacher=user)

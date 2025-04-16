@@ -1,13 +1,20 @@
-from django.shortcuts import render, redirect
-from .models import Student, Course
+from django.shortcuts import render, redirect, get_object_or_404
+from .models import Student, Course, Grade
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth import login, authenticate
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, user_passes_test
 from django.views.generic.edit import CreateView
 from django.urls import reverse_lazy
 from .forms import CustomUserCreationForm
 from django.contrib import messages
+from .forms import GradeForm
+from django.contrib.auth import get_user_model
 
+User = get_user_model()
+
+
+def is_teacher(user):
+    return user.is_authenticated and user.is_teacher
 
 
 @login_required
@@ -27,6 +34,7 @@ def register_view(request):
     else:
         form = CustomUserCreationForm()
     return render(request, 'education/register.html', {'form': form})
+
 
 def login_view(request):
     if request.method == 'POST':
@@ -74,3 +82,29 @@ def search_students(request):
         'show_results': show_results,
     }
     return render(request, 'education/student_search.html', context)
+
+
+
+@login_required
+@user_passes_test(is_teacher)
+def add_grade(request):
+    if request.method == 'POST':
+        form = GradeForm(request.POST, user=request.user)
+        if form.is_valid():
+            form.save()
+            return redirect('grade_list')
+    else:
+        form = GradeForm(user=request.user)
+    return render(request, 'education/add_grade.html', {'form': form})
+
+
+@login_required
+def grade_list(request):
+    grades = Grade.objects.select_related('student', 'course').all()
+    return render(request, 'education/grade_list.html', {'grades': grades})
+
+
+@login_required
+def student_list(request):
+    students = Student.objects.all()
+    return render(request, 'education/student_list.html', {'students': students})

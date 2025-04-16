@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}Студенческая система{% endblock %}</title>
+</head>
+<body>
+    <h1>Добро пожаловать!</h1>
+    <nav>
+        <a href="/students/">Студенты</a> |
+        <a href="/grades/">Оценки</a> |
+        <a href="/students/search/">Поиск</a> |
+        <a href="/profile/">Профиль</a>
+    </nav>
+    <hr>
+    {% block content %}
+    {% endblock %}
+</body>
+</html>

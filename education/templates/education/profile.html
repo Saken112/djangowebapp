@@ -2,7 +2,20 @@
 
 {% block content %}
   <h2>Профиль пользователя</h2>
-  <p>Добро пожаловать, {{ user.username }}!</p>
-  <p>Ваш email: {{ user.email }}</p>
+  <p><strong>Логин:</strong> {{ user.username }}</p>
+  <p><strong>Email:</strong> {{ user.email }}</p>
+  <p><strong>Дата рождения:</strong> {{ user.date_of_birth|date:"d.m.Y" }}</p>
+
+  <h3>Оценки</h3>
+  {% if grades %}
+    <ul>
+      {% for grade in grades %}
+        <li>{{ grade.course.name }}: {{ grade.value }}</li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p>Оценок пока нет.</p>
+  {% endif %}
+
   <a href="{% url 'logout' %}">Выйти</a>
 {% endblock %}
