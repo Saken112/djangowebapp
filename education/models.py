@@ -24,7 +24,9 @@ class Student(models.Model):
     def average_grade(self):
         grades = self.grade_set.all()
         if grades:
-            return round(sum(g.grade for g in grades) / grades.count(), 2)
+            weighted_sum = sum(g.grade * g.weight for g in grades)
+            total_weight = sum(g.weight for g in grades)
+            return round(weighted_sum / total_weight, 2) if total_weight else None
         return None
 
     def __str__(self):
@@ -45,20 +47,44 @@ class Course(models.Model):
 
     def __str__(self):
         return self.name
+
+
 class Grade(models.Model):
+    GRADE_TYPE_CHOICES = [
+        ('exam', 'Exam'),
+        ('quiz', 'Quiz'),
+        ('project', 'Project'),
+        ('homework', 'Homework'),
+        ('other', 'Other'),
+    ]
+
     student = models.ForeignKey(Student, on_delete=models.CASCADE)
     course = models.ForeignKey(Course, on_delete=models.CASCADE)
-    grade = models.DecimalField(max_digits=4, decimal_places=2)
+    grade = models.DecimalField(
+        max_digits=5,
+        decimal_places=2,
+        validators=[MinValueValidator(0.00), MaxValueValidator(100.00)]
+    )
+    grade_type = models.CharField(max_length=20, choices=GRADE_TYPE_CHOICES, default='other')
+    weight = models.DecimalField(
+        max_digits=4,
+        decimal_places=2,
+        default=1.00,
+        validators=[MinValueValidator(0.1), MaxValueValidator(10.0)]
+    )
+    comments = models.TextField(blank=True, null=True)
     date_received = models.DateField(auto_now_add=True)
+    graded_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        limit_choices_to={'is_teacher': True},
+        related_name='given_grades'
+    )
 
     class Meta:
-        unique_together = ('student', 'course')
+        unique_together = ('student', 'course', 'grade_type')
 
     def __str__(self):
-        return f"{self.student} - {self.course}: {self.grade}"
-
-grade = models.DecimalField(
-    max_digits=4,
-    decimal_places=2,
-    validators=[MinValueValidator(0.00), MaxValueValidator(100.00)]
-)
+        return f"{self.student} - {self.course} ({self.grade_type}): {self.grade}"
