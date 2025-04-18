@@ -1,10 +1,27 @@
-<h2>Личный кабинет преподавателя</h2>
+{% extends 'base.html' %}
 
-<h3>Курсы:</h3>
-<ul>
-    {% for course in courses %}
-        <li>{{ course.name }}</li>
-    {% empty %}
-        <li>Пока нет курсов</li>
-    {% endfor %}
-</ul>
+{% block content %}
+
+<div class="container mt-5">
+
+
+    <h2 class="text-center mb-4">👨‍🏫 Личный кабинет преподавателя</h2>
+
+    <div class="card shadow p-4">
+        <h4 class="mb-3">📚 Мои курсы</h4>
+
+        {% if courses %}
+            <ul class="list-group">
+                {% for course in courses %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        {{ course.name }}
+                        <span class="badge bg-primary rounded-pill">ID: {{ course.id }}</span>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <div class="alert alert-info">Пока нет курсов</div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

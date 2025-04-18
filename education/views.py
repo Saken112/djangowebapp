@@ -30,7 +30,7 @@ def register_view(request):
             user = form.save()
             login(request, user)
             messages.success(request, "Регистрация успешна! Вы вошли в систему.")
-            return redirect('/accounts/dashboard/')
+            return redirect('/profile/')
     else:
         form = CustomUserCreationForm()
     return render(request, 'education/register.html', {'form': form})

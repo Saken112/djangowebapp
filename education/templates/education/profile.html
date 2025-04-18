@@ -1,21 +1,27 @@
-{% extends 'base_generic.html' %}
+{% extends 'base.html' %}
 
 {% block content %}
-  <h2>Профиль пользователя</h2>
-  <p><strong>Логин:</strong> {{ user.username }}</p>
-  <p><strong>Email:</strong> {{ user.email }}</p>
-  <p><strong>Дата рождения:</strong> {{ user.date_of_birth|date:"d.m.Y" }}</p>
 
-  <h3>Оценки</h3>
-  {% if grades %}
-    <ul>
-      {% for grade in grades %}
-        <li>{{ grade.course.name }}: {{ grade.value }}</li>
-      {% endfor %}
-    </ul>
-  {% else %}
-    <p>Оценок пока нет.</p>
-  {% endif %}
+<div class="container mt-5">
 
-  <a href="{% url 'logout' %}">Выйти</a>
+
+    <h2 class="text-center mb-4">👨‍🏫 Личный кабинет преподавателя</h2>
+
+    <div class="card shadow p-4">
+        <h4 class="mb-3">📚 Мои курсы</h4>
+
+        {% if courses %}
+            <ul class="list-group">
+                {% for course in courses %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        {{ course.name }}
+                        <span class="badge bg-primary rounded-pill">ID: {{ course.id }}</span>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <div class="alert alert-info">Пока нет курсов</div>
+        {% endif %}
+    </div>
+</div>
 {% endblock %}
