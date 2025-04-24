@@ -1,21 +1,58 @@
 {% extends 'base_generic.html' %}
 
 {% block content %}
-  <h2>Профиль пользователя</h2>
-  <p><strong>Логин:</strong> {{ user.username }}</p>
-  <p><strong>Email:</strong> {{ user.email }}</p>
-  <p><strong>Дата рождения:</strong> {{ user.date_of_birth|date:"d.m.Y" }}</p>
+<div class="container mt-5">
+    <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+            <h3 class="mb-0">Профиль студента</h3>
+        </div>
+        <div class="card-body">
+            <div class="row align-items-center">
+                <div class="col-md-3 text-center">
+                    {% if user.profile_image %}
+                        <img src="{{ user.profile_image.url }}" alt="Фото профиля" class="img-thumbnail" style="max-height: 150px;">
+                    {% else %}
+                        <img src="https://via.placeholder.com/150" alt="Нет фото" class="img-thumbnail">
+                    {% endif %}
+                </div>
+                <div class="col-md-9">
+                    <p><strong>Имя пользователя:</strong> {{ user.username }}</p>
+                    <p><strong>Имя:</strong> {{ user.first_name }}</p>
+                    <p><strong>Фамилия:</strong> {{ user.last_name }}</p>
+                    <p><strong>Email:</strong> {{ user.email }}</p>
+                    <p><strong>Дата рождения:</strong> {{ user.birth_date|date:"d.m.Y" }}</p>
 
-  <h3>Оценки</h3>
-  {% if grades %}
-    <ul>
-      {% for grade in grades %}
-        <li>{{ grade.course.name }}: {{ grade.value }}</li>
-      {% endfor %}
-    </ul>
-  {% else %}
-    <p>Оценок пока нет.</p>
-  {% endif %}
+                </div>
+            </div>
 
-  <a href="{% url 'logout' %}">Выйти</a>
+            <hr>
+
+            <h5 class="mt-4">Оценки</h5>
+            {% if grades %}
+                <table class="table table-striped mt-2">
+                    <thead>
+                        <tr>
+                            <th>Курс</th>
+                            <th>Оценка</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for grade in grades %}
+                            <tr>
+                                <td>{{ grade.course.name }}</td>
+                                <td>{{ grade.value }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <p>Оценок пока нет.</p>
+            {% endif %}
+
+            <div class="mt-4">
+                <a href="{% url 'logout' %}" class="btn btn-outline-danger">Выйти</a>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}

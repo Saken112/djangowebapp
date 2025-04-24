@@ -2,14 +2,16 @@
 {% load widget_tweaks %}
 
 {% block content %}
-<div class="container vh-100 d-flex justify-content-center align-items-center">
+<div class="container d-flex justify-content-center align-items-center" style="min-height: 100vh; padding-top: 5px;">
   <div class="card shadow p-4" style="min-width: 300px; max-width: 500px; width: 100%;">
     <h2 class="text-center mb-4">Регистрация</h2>
     <form method="post" enctype="multipart/form-data" novalidate>
       {% csrf_token %}
       {% for field in form %}
         <div class="mb-3">
-          <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}{% if field.field.required %}*{% endif %}</label>
+          <label {% if field.id_for_label %}for="{{ field.id_for_label }}"{% endif %} class="form-label">
+            {{ field.label }}{% if field.field.required %}*{% endif %}
+          </label>
           {{ field|add_class:"form-control" }}
           {% if field.errors %}
             <div class="text-danger small mt-1">{{ field.errors|striptags }}</div>

@@ -5,36 +5,44 @@ from django.contrib.auth import login, authenticate
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.views.generic.edit import CreateView
 from django.urls import reverse_lazy
-from .forms import CustomUserCreationForm
+from .forms import CustomUserCreationForm, GradeForm, ProfileUpdateForm
 from django.contrib import messages
-from .forms import GradeForm
 from django.contrib.auth import get_user_model
+from django.db.models import Prefetch
 
 User = get_user_model()
 
-
 def is_teacher(user):
     return user.is_authenticated and user.is_teacher
-
 
 @login_required
 def student_list(request):
     students = Student.objects.all()
     return render(request, 'education/student_list.html', {'students': students})
 
-
 def register_view(request):
     if request.method == 'POST':
-        form = CustomUserCreationForm(request.POST)
+        form = CustomUserCreationForm(request.POST, request.FILES)
         if form.is_valid():
             user = form.save()
+            if user.is_student and not hasattr(user, 'student'):
+                Student.objects.create(
+                    user=user,
+                    first_name=user.first_name,
+                    last_name=user.last_name,
+                    email=user.email
+                )
             login(request, user)
             messages.success(request, "Регистрация успешна! Вы вошли в систему.")
-            return redirect('/profile/')
+            if user.is_student:
+                return redirect('student_dashboard')
+            elif user.is_teacher:
+                return redirect('teacher_dashboard')
+            else:
+                return redirect('unknown_role')
     else:
         form = CustomUserCreationForm()
     return render(request, 'education/register.html', {'form': form})
-
 
 def login_view(request):
     if request.method == 'POST':
@@ -47,17 +55,14 @@ def login_view(request):
         form = AuthenticationForm()
     return render(request, 'education/login.html', {'form': form})
 
-
 @login_required
 def profile(request):
     return render(request, 'education/profile.html')
-
 
 class RegisterView(CreateView):
     form_class = CustomUserCreationForm
     template_name = 'education/register.html'
     success_url = reverse_lazy('login')
-
 
 def search_students(request):
     first_name = request.GET.get('first_name', '').strip()
@@ -83,8 +88,6 @@ def search_students(request):
     }
     return render(request, 'education/student_search.html', context)
 
-
-
 @login_required
 @user_passes_test(is_teacher)
 def add_grade(request):
@@ -97,14 +100,42 @@ def add_grade(request):
         form = GradeForm(user=request.user)
     return render(request, 'education/add_grade.html', {'form': form})
 
-
 @login_required
 def grade_list(request):
     grades = Grade.objects.select_related('student', 'course').all()
     return render(request, 'education/grade_list.html', {'grades': grades})
 
+@login_required
+def edit_profile(request):
+    if request.method == 'POST':
+        form = ProfileUpdateForm(request.POST, request.FILES, instance=request.user)
+        if form.is_valid():
+            form.save()
+            return redirect('edit_profile')
+    else:
+        form = ProfileUpdateForm(instance=request.user)
+    return render(request, 'education/edit_profile.html', {'form': form})
 
 @login_required
-def student_list(request):
-    students = Student.objects.all()
-    return render(request, 'education/student_list.html', {'students': students})
+def student_dashboard(request):
+    return render(request, 'accounts/student_dashboard.html')
+
+
+
+@login_required
+def teacher_dashboard(request):
+    courses = Course.objects.select_related('teacher').all()
+    return render(request, 'accounts/teacher_dashboard.html', {
+        'courses': courses,
+        'debug_count': courses.count()
+    })
+
+@login_required
+def all_courses_view(request):
+    courses = Course.objects.select_related('teacher').all()
+    return render(request, 'education/all_courses.html', {'courses': courses})
+
+
+@login_required
+def unknown_role(request):
+    return render(request, 'accounts/unknown_role.html')

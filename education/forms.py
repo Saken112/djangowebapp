@@ -15,16 +15,24 @@ class CustomUserCreationForm(UserCreationForm):
 
     class Meta:
         model = CustomUser
-        fields = ['username', 'email', 'birth_date', 'profile_image', 'password1', 'password2', 'role']
+        fields = [
+            'username', 'first_name', 'last_name', 'email',
+            'birth_date', 'profile_image', 'password1', 'password2', 'role'
+        ]
+        widgets = {
+            'birth_date': forms.DateInput(attrs={'type': 'date'}),
+        }
 
     def save(self, commit=True):
         user = super().save(commit=False)
         role = self.cleaned_data.get('role')
+        user.first_name = self.cleaned_data.get('first_name')
+        user.last_name = self.cleaned_data.get('last_name')
         user.is_student = role == 'student'
         user.is_teacher = role == 'teacher'
         if commit:
             user.save()
-            if user.is_student:
+            if user.is_student and not hasattr(user, 'student'):
                 Student.objects.create(
                     user=user,
                     first_name=user.first_name,
@@ -43,3 +51,11 @@ class GradeForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         if user and user.is_teacher:
             self.fields['course'].queryset = Course.objects.filter(teacher=user)
+
+class ProfileUpdateForm(forms.ModelForm):
+    class Meta:
+        model = CustomUser
+        fields = ['username', 'email', 'birth_date', 'profile_image']
+        widgets = {
+            'birth_date': forms.DateInput(attrs={'type': 'date'}),
+        }

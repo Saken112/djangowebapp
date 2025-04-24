@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="text-center mb-4">📚 Все курсы в системе</h2>
+
+    <div class="card shadow p-4">
+        {% if courses %}
+            <ul class="list-group">
+                {% for course in courses %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        {{ course.name }}
+                        <span class="text-muted">Преподаватель: {{ course.teacher.get_full_name|default:"Не назначен" }}</span>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <div class="alert alert-info">Нет доступных курсов</div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
