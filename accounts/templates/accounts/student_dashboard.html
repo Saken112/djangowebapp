@@ -27,27 +27,9 @@
 
             <hr>
 
-            <h5 class="mt-4">Оценки</h5>
-            {% if grades %}
-                <table class="table table-striped mt-2">
-                    <thead>
-                        <tr>
-                            <th>Курс</th>
-                            <th>Оценка</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for grade in grades %}
-                            <tr>
-                                <td>{{ grade.course.name }}</td>
-                                <td>{{ grade.value }}</td>
-                            </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            {% else %}
-                <p>Оценок пока нет.</p>
-            {% endif %}
+<a href="{% url 'student_grades' %}" class="btn btn-outline-primary mt-3">📊 Мои оценки</a>
+
+
 
             <div class="mt-4">
                 <a href="{% url 'logout' %}" class="btn btn-outline-danger">Выйти</a>

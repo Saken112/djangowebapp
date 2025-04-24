@@ -22,11 +22,11 @@ class Student(models.Model):
     email = models.EmailField(unique=True)
     enrollment_date = models.DateField(auto_now_add=True)
 
-    def average_grade(self):
-        grades = self.grade_set.all()
-        if grades:
-            weighted_sum = sum(g.grade * g.weight for g in grades)
+    def final_grade_for_course(self, course):
+        grades = self.grade_set.filter(course=course)
+        if grades.exists():
             total_weight = sum(g.weight for g in grades)
+            weighted_sum = sum(g.grade * g.weight for g in grades)
             return round(weighted_sum / total_weight, 2) if total_weight else None
         return None
 

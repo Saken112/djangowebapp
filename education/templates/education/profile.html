@@ -1,27 +1,30 @@
 {% extends 'base.html' %}
 
 {% block content %}
-
 <div class="container mt-5">
-
-
-    <h2 class="text-center mb-4">👨‍🏫 Личный кабинет преподавателя</h2>
+    <h2 class="text-center mb-4">👨‍🏫 Профиль преподавателя</h2>
 
     <div class="card shadow p-4">
-        <h4 class="mb-3">📚 Мои курсы</h4>
+        <div class="row align-items-center">
+            <div class="col-md-4 text-center">
+                {% if user.profile_image %}
+                    <img src="{{ user.profile_image.url }}"
+                         class="rounded-circle shadow"
+                         style="width: 200px; height: 200px; object-fit: cover;"
+                         alt="Фото профиля">
+                {% else %}
+                    <div class="text-muted">Фото не загружено</div>
+                {% endif %}
+            </div>
+            <div class="col-md-8">
+                <p><strong>Имя пользователя:</strong> {{ user.username }}</p>
+                <p><strong>Email:</strong> {{ user.email }}</p>
+                <p><strong>Дата рождения:</strong> {{ user.birth_date|date:"d.m.Y" }}</p>
 
-        {% if courses %}
-            <ul class="list-group">
-                {% for course in courses %}
-                    <li class="list-group-item d-flex justify-content-between align-items-center">
-                        {{ course.name }}
-                        <span class="badge bg-primary rounded-pill">ID: {{ course.id }}</span>
-                    </li>
-                {% endfor %}
-            </ul>
-        {% else %}
-            <div class="alert alert-info">Пока нет курсов</div>
-        {% endif %}
+                <a href="{% url 'teacher_dashboard' %}" class="btn btn-outline-primary mt-3">Мои курсы</a>
+                <a href="{% url 'edit_profile' %}" class="btn btn-outline-secondary mt-3 ms-2">Редактировать профиль</a>
+            </div>
+        </div>
     </div>
 </div>
 {% endblock %}

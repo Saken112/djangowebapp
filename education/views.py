@@ -55,9 +55,16 @@ def login_view(request):
         form = AuthenticationForm()
     return render(request, 'education/login.html', {'form': form})
 
+
 @login_required
 def profile(request):
-    return render(request, 'education/profile.html')
+    if request.user.is_student:
+        return redirect('student_dashboard')
+    elif request.user.is_teacher:
+        return redirect('teacher_dashboard')
+    else:
+        return redirect('unknown_role')
+
 
 class RegisterView(CreateView):
     form_class = CustomUserCreationForm
@@ -111,15 +118,20 @@ def edit_profile(request):
         form = ProfileUpdateForm(request.POST, request.FILES, instance=request.user)
         if form.is_valid():
             form.save()
-            return redirect('edit_profile')
+            messages.success(request, "Профиль успешно обновлен!")
+            return redirect('profile')
     else:
         form = ProfileUpdateForm(instance=request.user)
     return render(request, 'education/edit_profile.html', {'form': form})
 
 @login_required
 def student_dashboard(request):
-    return render(request, 'accounts/student_dashboard.html')
-
+    student = get_object_or_404(Student, user=request.user)
+    grades = Grade.objects.filter(student=student).select_related('course')
+    return render(request, 'accounts/student_dashboard.html', {
+        'student': student,
+        'grades': grades
+    })
 
 
 @login_required
@@ -139,3 +151,29 @@ def all_courses_view(request):
 @login_required
 def unknown_role(request):
     return render(request, 'accounts/unknown_role.html')
+
+@login_required
+def student_grades_view(request):
+    student = get_object_or_404(Student, user=request.user)
+    grades = Grade.objects.filter(student=student).select_related('course')
+
+
+    course_grades = {}
+    final_grades = {}
+
+    for grade in grades:
+        course = grade.course
+        if course not in course_grades:
+            course_grades[course] = []
+        course_grades[course].append(grade)
+
+    for course, grades in course_grades.items():
+        total_weight = sum(g.weight for g in grades)
+        weighted_sum = sum(g.grade * g.weight for g in grades)
+        final = round(weighted_sum / total_weight, 2) if total_weight else None
+        final_grades[course] = final
+
+    return render(request, 'education/student_grades.html', {
+        'course_grades': course_grades,
+        'final_grades': final_grades,
+    })

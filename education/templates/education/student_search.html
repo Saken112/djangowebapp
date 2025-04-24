@@ -20,6 +20,9 @@
 <body>
     <div class="search-container">
         <div class="card p-4 shadow-sm w-100" style="max-width: 600px;">
+
+            <a href="{% url 'profile' %}" class="btn btn-secondary mb-3">← Назад в профиль</a>
+
             <h1 class="text-center mb-4">Поиск студентов</h1>
             <form method="get" action="{% url 'search_students' %}">
                 <div class="mb-3">
@@ -33,6 +36,7 @@
                         <option value="">-- Все курсы --</option>
                         {% for course in courses %}
                             <option value="{{ course.id }}" {% if course_id == course.id|stringformat:"s" %}selected{% endif %}>
+
                                 {{ course.name }}
                             </option>
                         {% endfor %}
