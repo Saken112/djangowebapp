@@ -3,6 +3,7 @@ from django.contrib.auth.models import AbstractUser
 from django.conf import settings
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.contrib.auth.decorators import login_required
+from decimal import Decimal
 
 
 class CustomUser(AbstractUser):
@@ -23,11 +24,26 @@ class Student(models.Model):
     enrollment_date = models.DateField(auto_now_add=True)
 
     def final_grade_for_course(self, course):
+        GRADE_WEIGHTS = {
+            'exam': Decimal('0.5'),
+            'project': Decimal('0.3'),
+            'quiz': Decimal('0.1'),
+            'homework': Decimal('0.1'),
+            'other': Decimal('0.1'),
+        }
+
         grades = self.grade_set.filter(course=course)
         if grades.exists():
-            total_weight = sum(g.weight for g in grades)
-            weighted_sum = sum(g.grade * g.weight for g in grades)
+            weighted_sum = Decimal('0')
+            total_weight = Decimal('0')
+
+            for g in grades:
+                weight = GRADE_WEIGHTS.get(g.grade_type, Decimal('0.1'))
+                weighted_sum += g.grade * weight
+                total_weight += weight
+
             return round(weighted_sum / total_weight, 2) if total_weight else None
+
         return None
 
     def __str__(self):

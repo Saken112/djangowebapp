@@ -11,6 +11,7 @@ from django.contrib.auth import get_user_model
 from django.db.models import Prefetch
 from django.contrib import messages
 from decimal import Decimal
+from django.utils.dateparse import parse_date
 
 
 User = get_user_model()
@@ -57,6 +58,8 @@ def login_view(request):
     else:
         form = AuthenticationForm()
     return render(request, 'education/login.html', {'form': form})
+
+
 
 
 @login_required
@@ -113,8 +116,33 @@ def add_grade(request):
 
 @login_required
 def grade_list(request):
-    grades = Grade.objects.select_related('student', 'course').all()
-    return render(request, 'education/grade_list.html', {'grades': grades})
+    grades = Grade.objects.select_related('student', 'course')
+    all_courses = Course.objects.all()
+
+    course_id = request.GET.get('course')
+    grade_type = request.GET.get('grade_type')
+    date_from = request.GET.get('date_from')
+    date_to = request.GET.get('date_to')
+    student_name = request.GET.get('student_name')
+
+    if course_id:
+        grades = grades.filter(course__id=course_id)
+    if grade_type:
+        grades = grades.filter(grade_type=grade_type)
+    if student_name:
+        grades = grades.filter(
+            student__first_name__icontains=student_name
+        ) | grades.filter(student__last_name__icontains=student_name)
+    if date_from:
+        grades = grades.filter(date_received__gte=parse_date(date_from))
+    if date_to:
+        grades = grades.filter(date_received__lte=parse_date(date_to))
+
+    return render(request, 'education/grade_list.html', {
+        'grades': grades,
+        'all_courses': all_courses,
+        'grade_types': Grade.GRADE_TYPE_CHOICES,
+    })
 
 @login_required
 def edit_profile(request):
