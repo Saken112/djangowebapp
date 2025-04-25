@@ -67,7 +67,7 @@ class Grade(models.Model):
         validators=[MinValueValidator(0.00), MaxValueValidator(100.00)]
     )
     grade_type = models.CharField(max_length=20, choices=GRADE_TYPE_CHOICES, default='other')
-    weight = models.DecimalField(
+    weight = models.DecimalField(  
         max_digits=4,
         decimal_places=2,
         default=1.00,
@@ -83,6 +83,13 @@ class Grade(models.Model):
         limit_choices_to={'is_teacher': True},
         related_name='given_grades'
     )
+
+    class Meta:
+        unique_together = ('student', 'course', 'grade_type')
+
+    def __str__(self):
+        return f"{self.student} - {self.course} ({self.grade_type}): {self.grade}"
+
 
     class Meta:
         unique_together = ('student', 'course', 'grade_type')

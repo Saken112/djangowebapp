@@ -1,8 +1,6 @@
-from .models import Student
-from django.contrib.auth.forms import UserCreationForm
 from django import forms
-from .models import CustomUser
-from .models import Grade, Course
+from django.contrib.auth.forms import UserCreationForm
+from .models import CustomUser, Student, Grade, Course
 
 
 class CustomUserCreationForm(UserCreationForm):
@@ -20,7 +18,7 @@ class CustomUserCreationForm(UserCreationForm):
             'birth_date', 'profile_image', 'password1', 'password2', 'role'
         ]
         widgets = {
-            'birth_date': forms.DateInput(attrs={'type': 'date'}),
+            'birth_date': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
         }
 
     def save(self, commit=True):
@@ -41,21 +39,49 @@ class CustomUserCreationForm(UserCreationForm):
                 )
         return user
 
+
 class GradeForm(forms.ModelForm):
     class Meta:
         model = Grade
-        fields = ['student', 'course', 'grade']
+        fields = ['student', 'course', 'grade_type', 'grade', 'comments']
+        widgets = {
+            'grade': forms.NumberInput(attrs={'step': '0.01', 'min': 0, 'max': 100}),
+            'comments': forms.Textarea(attrs={'rows': 2}),
+        }
 
     def __init__(self, *args, **kwargs):
         user = kwargs.pop('user', None)
         super().__init__(*args, **kwargs)
+
+        for field in self.fields.values():
+            if not isinstance(field.widget, forms.RadioSelect):
+                field.widget.attrs['class'] = 'form-control'
+
+        self.fields['grade_type'].widget.attrs['class'] = 'form-select'
+        self.fields['student'].widget.attrs['class'] = 'form-select'
+        self.fields['course'].widget.attrs['class'] = 'form-select'
+
         if user and user.is_teacher:
             self.fields['course'].queryset = Course.objects.filter(teacher=user)
+
+
+    def save(self, commit=True):
+        instance = super().save(commit=False)
+        instance.weight = 1.00
+        if commit:
+            instance.save()
+        return instance
+
 
 class ProfileUpdateForm(forms.ModelForm):
     class Meta:
         model = CustomUser
         fields = ['username', 'email', 'birth_date', 'profile_image']
         widgets = {
-            'birth_date': forms.DateInput(attrs={'type': 'date'}),
+            'birth_date': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
         }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field in self.fields.values():
+            field.widget.attrs['class'] = 'form-control'

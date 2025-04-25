@@ -1,10 +1,66 @@
 {% extends "base.html" %}
+
+{% if messages %}
+  <div class="container mt-4">
+    {% for message in messages %}
+      <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Закрыть"></button>
+      </div>
+    {% endfor %}
+  </div>
+{% endif %}
+
 {% block content %}
-  <h2>Добавить оценку</h2>
-  <form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Сохранить</button>
-  </form>
-  <a href="{% url 'grade_list' %}">Назад к списку оценок</a>
+<div class="container mt-5">
+    <h2 class="mb-4">➕ Добавить оценку</h2>
+
+    <form method="post">
+        {% csrf_token %}
+
+        {% if form.errors %}
+            <div class="alert alert-danger">
+                <strong>Ошибка:</strong> Пожалуйста, проверьте введённые данные.
+                <ul>
+                    {% for field in form %}
+                        {% for error in field.errors %}
+                            <li>{{ field.label }}: {{ error }}</li>
+                        {% endfor %}
+                    {% endfor %}
+                    {% for error in form.non_field_errors %}
+                        <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endif %}
+
+        <div class="mb-3">
+            <label class="form-label">Студент</label>
+            {{ form.student }}
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Курс</label>
+            {{ form.course }}
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Оценка</label>
+            {{ form.grade }}
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Тип оценки</label>
+            {{ form.grade_type }}
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Комментарий</label>
+            {{ form.comments }}
+        </div>
+
+        <button type="submit" class="btn btn-primary">💾 Сохранить</button>
+        <a href="{% url 'grade_list' %}" class="btn btn-secondary ms-2">← Назад к списку</a>
+    </form>
+</div>
 {% endblock %}

@@ -9,6 +9,9 @@ from .forms import CustomUserCreationForm, GradeForm, ProfileUpdateForm
 from django.contrib import messages
 from django.contrib.auth import get_user_model
 from django.db.models import Prefetch
+from django.contrib import messages
+from decimal import Decimal
+
 
 User = get_user_model()
 
@@ -102,6 +105,7 @@ def add_grade(request):
         form = GradeForm(request.POST, user=request.user)
         if form.is_valid():
             form.save()
+            messages.success(request, "Оценка успешно добавлена ✅")
             return redirect('grade_list')
     else:
         form = GradeForm(user=request.user)
@@ -157,9 +161,16 @@ def student_grades_view(request):
     student = get_object_or_404(Student, user=request.user)
     grades = Grade.objects.filter(student=student).select_related('course')
 
-
     course_grades = {}
     final_grades = {}
+
+    GRADE_WEIGHTS = {
+        'exam': Decimal('0.5'),
+        'project': Decimal('0.3'),
+        'quiz': Decimal('0.1'),
+        'homework': Decimal('0.1'),
+        'other': Decimal('0.1'),
+    }
 
     for grade in grades:
         course = grade.course
@@ -168,8 +179,13 @@ def student_grades_view(request):
         course_grades[course].append(grade)
 
     for course, grades in course_grades.items():
-        total_weight = sum(g.weight for g in grades)
-        weighted_sum = sum(g.grade * g.weight for g in grades)
+        weighted_sum = 0
+        total_weight = 0
+        for g in grades:
+            weight = GRADE_WEIGHTS.get(g.grade_type, 0.1)
+            weighted_sum += g.grade * weight
+            total_weight += weight
+
         final = round(weighted_sum / total_weight, 2) if total_weight else None
         final_grades[course] = final
 
