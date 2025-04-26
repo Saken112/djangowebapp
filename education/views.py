@@ -176,7 +176,7 @@ def teacher_dashboard(request):
 
 @login_required
 def all_courses_view(request):
-    courses = Course.objects.select_related('teacher').all()
+    courses = Course.objects.prefetch_related('teachers').all()
     return render(request, 'education/all_courses.html', {'courses': courses})
 
 

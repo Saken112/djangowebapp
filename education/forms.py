@@ -41,6 +41,14 @@ class CustomUserCreationForm(UserCreationForm):
 
 
 class GradeForm(forms.ModelForm):
+    GRADE_WEIGHTS = {
+        'exam': 0.5,
+        'project': 0.3,
+        'quiz': 0.1,
+        'homework': 0.1,
+        'other': 0.1,
+    }
+
     class Meta:
         model = Grade
         fields = ['student', 'course', 'grade_type', 'grade', 'comments']
@@ -62,12 +70,11 @@ class GradeForm(forms.ModelForm):
         self.fields['course'].widget.attrs['class'] = 'form-select'
 
         if user and user.is_teacher:
-            self.fields['course'].queryset = Course.objects.filter(teacher=user)
-
+            self.fields['course'].queryset = Course.objects.filter(teachers=user)
 
     def save(self, commit=True):
         instance = super().save(commit=False)
-        instance.weight = 1.00
+        instance.weight = self.GRADE_WEIGHTS.get(instance.grade_type, 0.1)
         if commit:
             instance.save()
         return instance

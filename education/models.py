@@ -2,9 +2,7 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.conf import settings
 from django.core.validators import MinValueValidator, MaxValueValidator
-from django.contrib.auth.decorators import login_required
 from decimal import Decimal
-
 
 class CustomUser(AbstractUser):
     birth_date = models.DateField(null=True, blank=True)
@@ -54,12 +52,11 @@ class Course(models.Model):
     name = models.CharField(max_length=100)
     code = models.CharField(max_length=10, unique=True)
     description = models.TextField(blank=True, null=True)
-    teacher = models.ForeignKey(
+    teachers = models.ManyToManyField(  # <-- Изменение здесь!
         settings.AUTH_USER_MODEL,
-        on_delete=models.SET_NULL,
-        null=True,
         blank=True,
-        limit_choices_to={'is_teacher': True}
+        limit_choices_to={'is_teacher': True},
+        related_name='courses'
     )
 
     def __str__(self):
@@ -68,11 +65,11 @@ class Course(models.Model):
 
 class Grade(models.Model):
     GRADE_TYPE_CHOICES = [
-        ('exam', 'Exam'),
-        ('quiz', 'Quiz'),
-        ('project', 'Project'),
-        ('homework', 'Homework'),
-        ('other', 'Other'),
+        ('exam', 'Экзамен'),
+        ('quiz', 'Тест'),
+        ('project', 'Проект'),
+        ('homework', 'Домашка'),
+        ('other', 'Другое'),
     ]
 
     student = models.ForeignKey(Student, on_delete=models.CASCADE)
@@ -83,11 +80,11 @@ class Grade(models.Model):
         validators=[MinValueValidator(0.00), MaxValueValidator(100.00)]
     )
     grade_type = models.CharField(max_length=20, choices=GRADE_TYPE_CHOICES, default='other')
-    weight = models.DecimalField(  
+    weight = models.DecimalField(
         max_digits=4,
         decimal_places=2,
-        default=1.00,
-        validators=[MinValueValidator(0.1), MaxValueValidator(10.0)]
+        default=Decimal('1.00'),
+        validators=[MinValueValidator(Decimal('0.1')), MaxValueValidator(Decimal('10.0'))]
     )
     comments = models.TextField(blank=True, null=True)
     date_received = models.DateField(auto_now_add=True)
@@ -99,13 +96,6 @@ class Grade(models.Model):
         limit_choices_to={'is_teacher': True},
         related_name='given_grades'
     )
-
-    class Meta:
-        unique_together = ('student', 'course', 'grade_type')
-
-    def __str__(self):
-        return f"{self.student} - {self.course} ({self.grade_type}): {self.grade}"
-
 
     class Meta:
         unique_together = ('student', 'course', 'grade_type')

@@ -8,7 +8,12 @@ class StudentAdmin(admin.ModelAdmin):
 
 @admin.register(Course)
 class CourseAdmin(admin.ModelAdmin):
-    list_display = ('name', 'code', 'teacher')
+    list_display = ('name', 'code', 'display_teachers')
+
+    def display_teachers(self, obj):
+        return ", ".join(teacher.username for teacher in obj.teachers.all())
+    display_teachers.short_description = "Преподаватели"
+
 
 @admin.register(Grade)
 class GradeAdmin(admin.ModelAdmin):
